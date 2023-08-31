@@ -14,6 +14,11 @@ import time
 
 bot = telebot.TeleBot(os.getenv('BOT_TOKEN'))
 
+r = redis.Redis(
+  host=os.getenv("REDIS_HOST"),
+  port=os.getenv("REDIS_PORT"),
+  password=os.getenv("REDIS_PASSWORD"))
+
 
 def createDriver() -> webdriver.Chrome:
     chrome_options = webdriver.ChromeOptions()
@@ -59,21 +64,29 @@ def autoAbsensi(driver: webdriver.Chrome) -> str:
         li = x.find_elements(By.TAG_NAME, "li")
         li[1].click()
     
-    while True:
-        try:
-            button = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID, "konfirmasi-kehadiran")))
-            button.click()
-            time.sleep(1)  # Delay for 1 seconds.
-            bot.send_message(os.getenv('GROUP_ID'), 'Berhasil absen')
-
-            
-            confirm = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "confirm")))
-            confirm.send_keys(Keys.ENTER)
-            confirm.click()
-            return {"message": "berhasil absen...!!"}
-        except:
-            
-            bot.send_message(os.environ['GROUP_ID'], 'belum waktunya absen')
+    try:
+        button = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID, "konfirmasi-kehadiran")))
+        button.click()
+        time.sleep(1)  # Delay for 1 seconds.
+        bot.send_message(os.getenv('GROUP_ID'), 'Berhasil absen')
+    
+                
+        confirm = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "confirm")))
+        confirm.send_keys(Keys.ENTER)
+        confirm.click()
+        r.set("message_absen", now)
+    
+        return {"message": "berhasil absen...!!"}
+    except:
+        get_message = r.get('message_absen')
+        bot.send_message(os.environ['GROUP_ID'], 'belum waktunya absen')
+    
+        if get_message:
+            return [
+                {"terakhir absen": get_message}
+                {"message": "belum waktu absen...!!"}
+            ]
+        else:
             return {"message": "belum waktu absen...!!"}
             
     
