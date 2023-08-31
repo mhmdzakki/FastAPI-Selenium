@@ -7,13 +7,17 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from webdriver_manager.chrome import ChromeDriverManager
 
+import pytz
 import redis
-import datetime
+from datetime import datetime
 import telebot
 import os
 import time
 
-now = datetime.datetime.now()
+indonesia_timezone = pytz.timezone('Asia/Jakarta')
+local_time = datetime.now()
+now = local_time.astimezone(indonesia_timezone)
+
 bot = telebot.TeleBot(os.getenv('BOT_TOKEN'))
 
 r = redis.Redis(
