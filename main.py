@@ -18,8 +18,8 @@ class Msg(BaseModel):
 async def root():
     driver=createDriver()
     absensi = autoAbsensi(driver)
-    
-    return {"message": "Auto absensi is running..."}
+    driver.close()
+    return absensi
 
 
 @app.get("/running-check")
