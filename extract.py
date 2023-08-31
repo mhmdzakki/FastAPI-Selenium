@@ -7,23 +7,14 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from webdriver_manager.chrome import ChromeDriverManager
 
-import pytz
-import redis
-from datetime import datetime
+
 import telebot
 import os
 import time
 
-indonesia_timezone = pytz.timezone('Asia/Jakarta')
-local_time = datetime.now()
-now = local_time.astimezone(indonesia_timezone)
 
 bot = telebot.TeleBot(os.getenv('BOT_TOKEN'))
 
-r = redis.Redis(
-  host=os.getenv("REDIS_HOST"),
-  port=os.getenv("REDIS_PORT"),
-  password=os.getenv("REDIS_PASSWORD"))
 
 
 def createDriver() -> webdriver.Chrome:
@@ -80,23 +71,12 @@ def autoAbsensi(driver: webdriver.Chrome) -> str:
         confirm = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "confirm")))
         confirm.send_keys(Keys.ENTER)
         confirm.click()
-        r.set("message_absen", now)
     
         return {"message": "berhasil absen...!!"}
     except:
-        get_message = r.get('message_absen')
+        
         bot.send_message(os.environ['GROUP_ID'], 'belum waktunya absen')
-    
-        if get_message:
-            return [
-                {"terakhir absen": get_message},
-                {"message": f"belum waktu absen...!!  |  {now}"}
-            ]
-        else:
-            return [
-                {"terakhir absen": ""},
-                {"message": f"belum waktu absen...!!  |  {now}"}
-            ]
+        return {"message": "belum waktu absen...!!"}
             
     
 
