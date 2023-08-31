@@ -7,11 +7,13 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from webdriver_manager.chrome import ChromeDriverManager
 
+import redis
+import datetime
 import telebot
 import os
 import time
 
-
+now = datetime.datetime.now()
 bot = telebot.TeleBot(os.getenv('BOT_TOKEN'))
 
 r = redis.Redis(
@@ -83,11 +85,14 @@ def autoAbsensi(driver: webdriver.Chrome) -> str:
     
         if get_message:
             return [
-                {"terakhir absen": get_message}
-                {"message": "belum waktu absen...!!"}
+                {"terakhir absen": get_message},
+                {"message": f"belum waktu absen...!!  |  {now}"}
             ]
         else:
-            return {"message": "belum waktu absen...!!"}
+            return [
+                {"terakhir absen": ""},
+                {"message": f"belum waktu absen...!!  |  {now}"}
+            ]
             
     
 
