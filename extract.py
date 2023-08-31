@@ -61,15 +61,13 @@ def autoAbsensi(driver: webdriver.Chrome) -> str:
     
     while True:
         try:
-            button = WebDriverWait(driver, 60).until(
-                EC.presence_of_element_located((By.ID, "konfirmasi-kehadiran")))
+            button = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID, "konfirmasi-kehadiran")))
             button.click()
-            time.sleep(1)  # Delay for 1 minute (60 seconds).
+            time.sleep(1)  # Delay for 1 seconds.
             bot.send_message(os.getenv('GROUP_ID'), 'Berhasil absen')
 
             
-            confirm = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CLASS_NAME, "confirm")))
+            confirm = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "confirm")))
             confirm.send_keys(Keys.ENTER)
             confirm.click()
             return {"message": "berhasil absen...!!"}
